@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <title>Put It On A List</title>
+  </head>
+  <body>
+    <form>
+      <nav>
+        <div class="nav-wrapper">
+          <a class="brand-logo center">Make A List</a>
+        </div>
+      </nav>
+      <button
+        class="btn waves-effect waves-light"
+        type="button"
+        onclick="saveList();"
+      >
+        Save List
+      </button>
+      <ul></ul>
+    </form>
+    <script>
+      const fs = require("fs");
+      const electron = require("electron");
+      const { ipcRenderer } = electron;
+      const ul = document.querySelector("ul");
+      let itemList = new Array();
+
+      // Add item
+      ipcRenderer.on("item:add", (event, item) => {
+        ul.className = "collection";
+        const li = document.createElement("li");
+        li.className = "collection-item";
+        const itemText = document.createTextNode(item);
+        li.appendChild(itemText);
+        ul.appendChild(li);
+      });
+
+      // Remove items
+      ipcRenderer.on("item:clear", () => {
+        ul.innerHTML = "";
+        ul.className = "";
+      });
+
+      // Remove item
+      ul.addEventListener("dblclick", removeItem);
+
+      function removeItem(event) {
+        event.target.remove();
+
+        if (ul.children.length == 0) {
+          ul.className = "";
+        }
+      }
+
+      // Save list
+      function saveList() {
+        const list = ul.querySelectorAll("li");
+
+        for (let i = 0; i < list.length; i++) {
+          let object = {};
+          object.item = list[i].innerHTML;
+
+          itemList.push(object);
+        }
+
+        fs.writeFile("lists/file.json", JSON.stringify(itemList), err => {
+          if (err) throw err;
+          console.log("success");
+        });
+      }
+    </script>
+  </body>
+</html>
