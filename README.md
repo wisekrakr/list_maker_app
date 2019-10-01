@@ -6,5 +6,5 @@ Items can be removed by double clicking. <br>
 <br>
 
 W.I.P <br>
-Gives lists a specific name. <br>
+Give lists a specific name. <br>
 Save lists in a JSON file.
